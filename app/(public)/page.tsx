@@ -1,11 +1,11 @@
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
-import type { Team, Match } from "@prisma/client"
+import type { Prisma } from "@prisma/client"
 
-type MatchWithTeams = Match & {
-  homeTeam: Team
-  awayTeam: Team
-}
+type TeamData = Prisma.TeamGetPayload<object>
+type MatchWithTeams = Prisma.MatchGetPayload<{
+  include: { homeTeam: true; awayTeam: true }
+}>
 
 export default async function HomePage() {
   const [teams, matches] = await Promise.all([
@@ -59,7 +59,7 @@ export default async function HomePage() {
           </Link>
         </div>
         <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
-          {teams.map((team: Team) => (
+          {teams.map((team: TeamData) => (
             <Link key={team.id} href={`/teams/${team.id}`} className="bg-[#111827] border border-[#1e293b] rounded-xl p-4 text-center hover:border-blue-500 hover:bg-[#1a2333] transition-all duration-200 hover:-translate-y-1 flex flex-col items-center gap-2">
               <img src={team.crest} alt={team.name} className="w-12 h-12 object-contain" />
               <span className="text-xs font-bold text-slate-100">{team.name}</span>
