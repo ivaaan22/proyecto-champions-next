@@ -2,6 +2,26 @@ import { prisma } from "@/lib/prisma"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 
+type TeamData = {
+  id: number
+  name: string
+  country: string
+  crest: string
+}
+
+type MatchData = {
+  id: number
+  date: string
+  phase: string
+  homeScore: number | null
+  awayScore: number | null
+  time: string | null
+  status: string
+  createdAt: Date
+  homeTeam?: TeamData
+  awayTeam?: TeamData
+}
+
 export default async function TeamDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 
@@ -22,8 +42,8 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ id:
   if (!team) notFound()
 
   const allMatches = [
-    ...team.homeMatches.map(m => ({ ...m, isHome: true  })),
-    ...team.awayMatches.map(m => ({ ...m, isHome: false })),
+    ...(team.homeMatches as MatchData[]).map((m: MatchData) => ({ ...m, isHome: true  })),
+    ...(team.awayMatches as MatchData[]).map((m: MatchData) => ({ ...m, isHome: false })),
   ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 
   const wins   = team.homeMatches.filter(m => m.status === "done" && m.homeScore! > m.awayScore!).length
@@ -68,9 +88,7 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ id:
           <p className="text-slate-500 text-sm text-center py-8">No hay partidos registrados.</p>
         ) : (
           allMatches.map(match => {
-            const opponent  = match.isHome
-              ? (match as any).awayTeam
-              : (match as any).homeTeam
+            const opponent  = match.isHome ? match.awayTeam : match.homeTeam
             const myScore   = match.isHome ? match.homeScore : match.awayScore
             const oppScore  = match.isHome ? match.awayScore : match.homeScore
             const result    = match.status === "done"
@@ -84,10 +102,10 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ id:
                 className="bg-[#060e1e] border border-[#1e3a5f] rounded-xl px-5 py-4 flex items-center justify-between hover:border-blue-400 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <img src={opponent.crest} alt={opponent.name} className="w-8 h-8 object-contain" />
+                  {opponent && <img src={opponent.crest} alt={opponent.name} className="w-8 h-8 object-contain" />}
                   <div>
                     <p className="text-sm font-semibold text-slate-100">
-                      {match.isHome ? "vs" : "@"} {opponent.name}
+                      {match.isHome ? "vs" : "@"} {opponent?.name}
                     </p>
                     <p className="text-xs text-slate-500">{match.date} · {match.phase.replace(/_/g, " ")}</p>
                   </div>
