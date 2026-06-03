@@ -1,11 +1,22 @@
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
-import type { Prisma } from "@prisma/client"
 
-type TeamData = Prisma.TeamGetPayload<object>
-type MatchWithTeams = Prisma.MatchGetPayload<{
-  include: { homeTeam: true; awayTeam: true }
-}>
+type TeamData = {
+  id: number
+  name: string
+  country: string
+  crest: string
+}
+
+type MatchWithTeams = {
+  id: number
+  date: string
+  phase: string
+  homeScore: number | null
+  awayScore: number | null
+  homeTeam: TeamData
+  awayTeam: TeamData
+}
 
 export default async function HomePage() {
   const [teams, matches] = await Promise.all([
@@ -59,7 +70,7 @@ export default async function HomePage() {
           </Link>
         </div>
         <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
-          {teams.map((team: TeamData) => (
+          {(teams as TeamData[]).map(team => (
             <Link key={team.id} href={`/teams/${team.id}`} className="bg-[#111827] border border-[#1e293b] rounded-xl p-4 text-center hover:border-blue-500 hover:bg-[#1a2333] transition-all duration-200 hover:-translate-y-1 flex flex-col items-center gap-2">
               <img src={team.crest} alt={team.name} className="w-12 h-12 object-contain" />
               <span className="text-xs font-bold text-slate-100">{team.name}</span>
@@ -78,7 +89,7 @@ export default async function HomePage() {
           </Link>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {matches.map((match: MatchWithTeams) => (
+          {(matches as MatchWithTeams[]).map(match => (
             <Link key={match.id} href={`/matches/${match.id}`} className="bg-[#0a1628] border border-[#1e3a5f] rounded-xl p-5 hover:border-blue-400 transition-all duration-200 block">
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-xs text-slate-400">📅 {match.date}</span>
