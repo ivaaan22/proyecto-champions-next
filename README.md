@@ -28,7 +28,7 @@ Fans and editors need a single place to **publish** Champions-style fixtures and
 - Post **comments** on matches.
 
 ### Backoffice
-- **`EDITOR`**: manage teams and matches.
+- **`EDITOR`**: create, edit and delete teams and matches.
 - **`ADMIN`**: full access including user and **role** management (`USER`, `EDITOR`, `ADMIN`).
 
 ### Product / engineering
@@ -59,7 +59,7 @@ Browser → Next.js App Router (RSC + Client Components)
                → Prisma (pg adapter) → Supabase PostgreSQL
                → Supabase Auth (sessions via @supabase/ssr)
                → Supabase Storage (avatar uploads)
-               → API Routes (/api/comments, /api/users/[id]/role)
+               → API Routes (/api/comments, /api/teams, /api/matches, /api/users/[id]/role)
 ```
 
 - **Public routes** expose teams, matches and standings for visitors.
@@ -113,6 +113,36 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ---
 
+## Roles and admin setup
+
+The app has three roles: `USER` (default), `EDITOR` and `ADMIN`.
+
+- **USER** — can comment on matches and upload an avatar.
+- **EDITOR** — can create, edit and delete teams and matches from the backoffice.
+- **ADMIN** — full access, including user and role management.
+
+New accounts are created as `USER`. To promote an account to `ADMIN`, run this in the **Supabase SQL Editor** (replace the email with the target account):
+
+```sql
+-- 1. Create / update the profile row as ADMIN
+INSERT INTO profiles (id, email, username, role, "createdAt", "updatedAt")
+SELECT id, email, raw_user_meta_data->>'username', 'ADMIN', NOW(), NOW()
+FROM auth.users
+WHERE email = 'your-email@example.com'
+ON CONFLICT (id) DO UPDATE SET role = 'ADMIN';
+
+-- 2. Sync the role into auth metadata (read by the header)
+UPDATE auth.users
+SET raw_user_meta_data = raw_user_meta_data || '{"role": "ADMIN"}'::jsonb
+WHERE email = 'your-email@example.com';
+```
+
+After running it, sign out and sign back in to refresh the session. Once you have one ADMIN, further role changes can be done from the **Users** panel in the backoffice — no SQL needed.
+
+> **Note:** demo admin credentials are provided privately in the assignment submission, not in this public repository.
+
+---
+
 ## Environment
 
 | Variable | Description |
@@ -131,7 +161,7 @@ Full template in `.env.example` (no secrets).
 | Command | Purpose |
 | --- | --- |
 | `npm run dev` | Start Next.js in development (Turbopack) |
-| `npm run build` | Production build |
+| `npm run build` | Production build (`prisma generate && next build`) |
 | `npm run start` | Start production server |
 | `npm run lint` | ESLint |
 | `npm run db:seed` | Run the Prisma seed script |
@@ -143,18 +173,22 @@ Full template in `.env.example` (no secrets).
 ```
 proyecto-champions-next/
 ├── app/
-│   ├── (public)/           # Public routes (teams, matches, standings)
+│   ├── (public)/           # Public routes (home, teams, matches, standings)
 │   │   ├── page.tsx        # Home
 │   │   ├── teams/          # Team list + detail
 │   │   ├── matches/        # Match list + detail + comments
 │   │   └── standings/      # Classification table
 │   ├── (auth)/             # Auth routes (login, register)
 │   ├── backoffice/         # Protected backoffice (EDITOR + ADMIN)
-│   │   ├── teams/
-│   │   ├── matches/
+│   │   ├── page.tsx        # Dashboard with counts
+│   │   ├── teams/          # List + new + edit
+│   │   ├── matches/        # List + new + edit
 │   │   └── users/          # Role management (ADMIN only)
 │   └── api/
-│       └── comments/       # POST comment
+│       ├── comments/       # POST comment
+│       ├── teams/          # CRUD teams
+│       ├── matches/        # CRUD matches
+│       └── users/[id]/role # Change user role
 ├── components/             # Header, Footer, CommentSection
 ├── lib/
 │   ├── prisma.ts           # Prisma client singleton
@@ -173,7 +207,7 @@ proyecto-champions-next/
 - [x] Visitor can browse **teams** and **matches** with DB-backed data.
 - [x] User can **register** and **log in** via Supabase Auth.
 - [x] Registered user can **upload avatar** and **comment** on a match.
-- [x] `EDITOR` can manage teams and matches in backoffice.
+- [x] `EDITOR` can create, edit and delete teams and matches in the backoffice.
 - [x] `ADMIN` can manage users and roles.
 - [x] App deploys to **Vercel** with production env vars set safely.
 
@@ -182,8 +216,8 @@ proyecto-champions-next/
 ## Deployment
 
 1. Push to GitHub and connect the repo to **Vercel**.
-2. Set all environment variables in the Vercel dashboard.
-3. Vercel builds and deploys automatically on every push to `master`.
+2. Set all environment variables in the Vercel dashboard (same keys as `.env`).
+3. Vercel runs `prisma generate && next build` and deploys automatically on every push to `master`.
 
 ---
 
