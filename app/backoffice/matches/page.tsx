@@ -1,6 +1,23 @@
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 
+type TeamData = {
+  id: number
+  name: string
+}
+
+type MatchData = {
+  id: number
+  date: string
+  phase: string
+  status: string
+  homeScore: number | null
+  awayScore: number | null
+  time: string | null
+  homeTeam: TeamData
+  awayTeam: TeamData
+}
+
 export default async function BackofficeMatchesPage() {
   const matches = await prisma.match.findMany({
     orderBy: { createdAt: "desc" },
@@ -27,7 +44,7 @@ export default async function BackofficeMatchesPage() {
             </tr>
           </thead>
           <tbody>
-            {matches.map(match => (
+            {(matches as MatchData[]).map((match: MatchData) => (
               <tr key={match.id} className="border-b border-[#1e3a5f] last:border-0 hover:bg-white/5 transition-colors">
                 <td className="px-6 py-3">
                   <span className="text-sm font-semibold text-slate-100">

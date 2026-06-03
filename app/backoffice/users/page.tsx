@@ -1,5 +1,13 @@
 import { prisma } from "@/lib/prisma"
 
+type ProfileData = {
+  id: string
+  email: string
+  username: string | null
+  avatarUrl: string | null
+  role: string
+}
+
 export default async function BackofficeUsersPage() {
   const profiles = await prisma.profile.findMany({ orderBy: { createdAt: "desc" } })
 
@@ -17,7 +25,7 @@ export default async function BackofficeUsersPage() {
             </tr>
           </thead>
           <tbody>
-            {profiles.map(profile => (
+            {(profiles as ProfileData[]).map((profile: ProfileData) => (
               <tr key={profile.id} className="border-b border-[#1e3a5f] last:border-0 hover:bg-white/5 transition-colors">
                 <td className="px-6 py-3">
                   <div className="flex items-center gap-3">

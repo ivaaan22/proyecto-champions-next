@@ -1,6 +1,13 @@
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 
+type TeamData = {
+  id: number
+  name: string
+  country: string
+  crest: string
+}
+
 export default async function BackofficeTeamsPage() {
   const teams = await prisma.team.findMany({ orderBy: { name: "asc" } })
 
@@ -22,7 +29,7 @@ export default async function BackofficeTeamsPage() {
             </tr>
           </thead>
           <tbody>
-            {teams.map(team => (
+            {(teams as TeamData[]).map((team: TeamData) => (
               <tr key={team.id} className="border-b border-[#1e3a5f] last:border-0 hover:bg-white/5 transition-colors">
                 <td className="px-6 py-3">
                   <div className="flex items-center gap-3">

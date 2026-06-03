@@ -9,7 +9,7 @@ type TeamData = {
   crest: string
 }
 
-type MatchData = {
+type HomeMatch = {
   id: number
   date: string
   phase: string
@@ -18,6 +18,31 @@ type MatchData = {
   time: string | null
   status: string
   createdAt: Date
+  awayTeam: TeamData
+}
+
+type AwayMatch = {
+  id: number
+  date: string
+  phase: string
+  homeScore: number | null
+  awayScore: number | null
+  time: string | null
+  status: string
+  createdAt: Date
+  homeTeam: TeamData
+}
+
+type CombinedMatch = {
+  id: number
+  date: string
+  phase: string
+  homeScore: number | null
+  awayScore: number | null
+  time: string | null
+  status: string
+  createdAt: Date
+  isHome: boolean
   homeTeam?: TeamData
   awayTeam?: TeamData
 }
@@ -41,20 +66,26 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ id:
 
   if (!team) notFound()
 
-  const allMatches = [
-    ...(team.homeMatches as MatchData[]).map((m: MatchData) => ({ ...m, isHome: true  })),
-    ...(team.awayMatches as MatchData[]).map((m: MatchData) => ({ ...m, isHome: false })),
-  ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  const homeMatches = team.homeMatches as HomeMatch[]
+  const awayMatches = team.awayMatches as AwayMatch[]
 
-  const wins   = team.homeMatches.filter(m => m.status === "done" && m.homeScore! > m.awayScore!).length
-               + team.awayMatches.filter(m => m.status === "done" && m.awayScore! > m.homeScore!).length
-  const draws  = allMatches.filter(m => m.status === "done" && m.homeScore === m.awayScore).length
-  const losses = allMatches.filter(m => m.status === "done").length - wins - draws
+  const allMatches: CombinedMatch[] = [
+    ...homeMatches.map((m: HomeMatch) => ({ ...m, isHome: true  })),
+    ...awayMatches.map((m: AwayMatch) => ({ ...m, isHome: false })),
+  ].sort((a: CombinedMatch, b: CombinedMatch) =>
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  )
+
+  const wins =
+    homeMatches.filter((m: HomeMatch) => m.status === "done" && (m.homeScore ?? 0) > (m.awayScore ?? 0)).length +
+    awayMatches.filter((m: AwayMatch) => m.status === "done" && (m.awayScore ?? 0) > (m.homeScore ?? 0)).length
+  const draws  = allMatches.filter((m: CombinedMatch) => m.status === "done" && m.homeScore === m.awayScore).length
+  const losses = allMatches.filter((m: CombinedMatch) => m.status === "done").length - wins - draws
 
   return (
     <div className="max-w-4xl mx-auto px-8 py-10">
 
-      {/* Cabecera del equipo */}
+      {/* Cabecera */}
       <div className="bg-[#0a1628] border border-[#1e3a5f] rounded-2xl p-8 mb-8 flex items-center gap-8">
         <img src={team.crest} alt={team.name} className="w-28 h-28 object-contain" />
         <div>
@@ -74,7 +105,9 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ id:
               <p className="text-xs text-slate-400">Derrotas</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-black text-slate-100">{allMatches.filter(m => m.status === "done").length}</p>
+              <p className="text-2xl font-black text-slate-100">
+                {allMatches.filter((m: CombinedMatch) => m.status === "done").length}
+              </p>
               <p className="text-xs text-slate-400">Jugados</p>
             </div>
           </div>
@@ -87,12 +120,13 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ id:
         {allMatches.length === 0 ? (
           <p className="text-slate-500 text-sm text-center py-8">No hay partidos registrados.</p>
         ) : (
-          allMatches.map(match => {
-            const opponent  = match.isHome ? match.awayTeam : match.homeTeam
-            const myScore   = match.isHome ? match.homeScore : match.awayScore
-            const oppScore  = match.isHome ? match.awayScore : match.homeScore
-            const result    = match.status === "done"
-              ? myScore! > oppScore! ? "W" : myScore! < oppScore! ? "L" : "D"
+          allMatches.map((match: CombinedMatch) => {
+            const opponent = match.isHome ? match.awayTeam : match.homeTeam
+            const myScore  = match.isHome ? match.homeScore : match.awayScore
+            const oppScore = match.isHome ? match.awayScore : match.homeScore
+            const result   = match.status === "done"
+              ? (myScore ?? 0) > (oppScore ?? 0) ? "W"
+              : (myScore ?? 0) < (oppScore ?? 0) ? "L" : "D"
               : null
 
             return (
