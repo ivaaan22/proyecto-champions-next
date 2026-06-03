@@ -1,14 +1,19 @@
 import { prisma } from "@/lib/prisma"
 
+type TeamData = {
+  id: number
+  name: string
+  crest: string
+}
+
 export default async function StandingsPage() {
   const teams = await prisma.team.findMany({ orderBy: { name: "asc" } })
 
-  // Datos simulados de clasificación basados en los equipos de la BD
-  const standings = teams.map((team, index) => ({
+  const standings = (teams as TeamData[]).map((team, index) => ({
     pos: index + 1,
     team,
     pj: 8,
-    pts: Math.max(0, 22 - index * 0.7 | 0),
+    pts: Math.max(0, (22 - index * 0.7) | 0),
     dg: index < 8 ? `+${8 - index}` : index < 24 ? `-${index - 8 + 1}` : `-${index - 15}`,
   }))
 
