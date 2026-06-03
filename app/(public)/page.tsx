@@ -1,5 +1,11 @@
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
+import type { Team, Match } from "@prisma/client"
+
+type MatchWithTeams = Match & {
+  homeTeam: Team
+  awayTeam: Team
+}
 
 export default async function HomePage() {
   const [teams, matches] = await Promise.all([
@@ -53,12 +59,12 @@ export default async function HomePage() {
           </Link>
         </div>
         <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
-          {teams.map(team => (
-            <div key={team.id} className="bg-[#111827] border border-[#1e293b] rounded-xl p-4 text-center hover:border-blue-500 hover:bg-[#1a2333] transition-all duration-200 hover:-translate-y-1 flex flex-col items-center gap-2">
+          {teams.map((team: Team) => (
+            <Link key={team.id} href={`/teams/${team.id}`} className="bg-[#111827] border border-[#1e293b] rounded-xl p-4 text-center hover:border-blue-500 hover:bg-[#1a2333] transition-all duration-200 hover:-translate-y-1 flex flex-col items-center gap-2">
               <img src={team.crest} alt={team.name} className="w-12 h-12 object-contain" />
               <span className="text-xs font-bold text-slate-100">{team.name}</span>
               <span className="text-xs text-slate-400">{team.country}</span>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
@@ -72,12 +78,12 @@ export default async function HomePage() {
           </Link>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {matches.map(match => (
+          {matches.map((match: MatchWithTeams) => (
             <Link key={match.id} href={`/matches/${match.id}`} className="bg-[#0a1628] border border-[#1e3a5f] rounded-xl p-5 hover:border-blue-400 transition-all duration-200 block">
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-xs text-slate-400">📅 {match.date}</span>
                 <span className="text-slate-600">•</span>
-                <span className="text-xs text-slate-400 font-semibold uppercase">{match.phase.replace("_", " ")}</span>
+                <span className="text-xs text-slate-400 font-semibold uppercase">{match.phase.replace(/_/g, " ")}</span>
               </div>
               <div className="grid grid-cols-3 items-center gap-2">
                 <div className="flex flex-col items-center gap-2">
