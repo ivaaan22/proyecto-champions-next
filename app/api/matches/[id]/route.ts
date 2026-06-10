@@ -36,7 +36,8 @@ export async function POST(request: NextRequest, { params }: Params) {
   const status  = formData.get("status")   as string
   const homeScore = formData.get("homeScore") ? Number(formData.get("homeScore")) : null
   const awayScore = formData.get("awayScore") ? Number(formData.get("awayScore")) : null
-  const time      = (formData.get("time") as string)?.trim() || null
+  const time      = (formData.get("time")  as string)?.trim() || null
+  const image     = (formData.get("image") as string)?.trim() || null
 
   if (!date || !phase || !homeId || !awayId || !status) {
     return NextResponse.json({ error: "Faltan campos" }, { status: 400 })
@@ -53,6 +54,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       homeScore: status === "done" ? homeScore : null,
       awayScore: status === "done" ? awayScore : null,
       time: status === "upcoming" ? time : null,
+      image,
     },
   })
 

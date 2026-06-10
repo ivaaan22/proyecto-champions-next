@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { notFound } from "next/navigation"
 import Link from "next/link"
+import ImageUpload from "@/components/ImageUpload"
 
 type Params = { params: Promise<{ id: string }> }
 type TeamOption = { id: number; name: string }
@@ -76,6 +77,8 @@ export default async function EditMatchPage({ params }: Params) {
           <input name="time" defaultValue={match.time ?? ""} placeholder="21:00" className="bg-[#060e1e] border border-[#1e3a5f] rounded-lg px-4 py-2.5 text-sm text-slate-100 placeholder-slate-600 outline-none focus:border-blue-500 transition-colors" />
         </div>
 
+        <ImageUpload name="image" folder="matches" label="Imagen del partido (opcional)" defaultValue={match.image ?? ""} />
+
         <div className="flex gap-3 mt-2">
           <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold px-5 py-2.5 rounded-lg border-none cursor-pointer transition-colors">
             Guardar cambios
@@ -86,7 +89,6 @@ export default async function EditMatchPage({ params }: Params) {
         </div>
       </form>
 
-      {/* Eliminar */}
       <form action={`/api/matches/${match.id}`} method="POST" className="mt-4">
         <input type="hidden" name="_action" value="delete" />
         <button type="submit" className="text-red-400 hover:text-red-300 text-sm bg-transparent border-none cursor-pointer transition-colors">

@@ -22,6 +22,12 @@ export default async function MatchDetailPage({ params }: { params: Promise<{ id
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
+  let isAdmin = false
+  if (user) {
+    const profile = await prisma.profile.findUnique({ where: { id: user.id } })
+    isAdmin = profile?.role === "ADMIN"
+  }
+
   return (
     <div className="max-w-4xl mx-auto px-8 py-10">
 
@@ -59,6 +65,10 @@ export default async function MatchDetailPage({ params }: { params: Promise<{ id
             <span className="text-sm text-slate-400">{match.awayTeam.country}</span>
           </div>
         </div>
+
+        {match.image && (
+          <img src={match.image} alt="Imagen del partido" className="w-full max-h-80 object-cover rounded-xl mt-6" />
+        )}
       </div>
 
       {/* Comentarios */}
@@ -66,6 +76,7 @@ export default async function MatchDetailPage({ params }: { params: Promise<{ id
         matchId={match.id}
         comments={match.comments}
         currentUserId={user?.id ?? null}
+        isAdmin={isAdmin}
       />
 
     </div>

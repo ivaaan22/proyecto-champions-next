@@ -1,4 +1,5 @@
 import Link from "next/link"
+import ImageUpload from "@/components/ImageUpload"
 
 export default function NewTeamPage() {
   return (
@@ -13,10 +14,9 @@ export default function NewTeamPage() {
           <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">País</label>
           <input name="country" required placeholder="España" className="bg-[#060e1e] border border-[#1e3a5f] rounded-lg px-4 py-2.5 text-sm text-slate-100 placeholder-slate-600 outline-none focus:border-blue-500 transition-colors" />
         </div>
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">URL del escudo</label>
-          <input name="crest" required placeholder="https://..." className="bg-[#060e1e] border border-[#1e3a5f] rounded-lg px-4 py-2.5 text-sm text-slate-100 placeholder-slate-600 outline-none focus:border-blue-500 transition-colors" />
-        </div>
+
+        <ImageUpload name="crest" folder="teams" label="Escudo del equipo" />
+
         <div className="flex gap-3 mt-2">
           <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold px-5 py-2.5 rounded-lg border-none cursor-pointer transition-colors">
             Crear equipo

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
+import ImageUpload from "@/components/ImageUpload"
 
 type TeamOption = { id: number; name: string }
 
@@ -65,6 +66,8 @@ export default async function NewMatchPage() {
           <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Hora (si es próximo)</label>
           <input name="time" placeholder="21:00" className="bg-[#060e1e] border border-[#1e3a5f] rounded-lg px-4 py-2.5 text-sm text-slate-100 placeholder-slate-600 outline-none focus:border-blue-500 transition-colors" />
         </div>
+
+        <ImageUpload name="image" folder="matches" label="Imagen del partido (opcional)" />
 
         <div className="flex gap-3 mt-2">
           <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold px-5 py-2.5 rounded-lg border-none cursor-pointer transition-colors">

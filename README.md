@@ -19,22 +19,22 @@ Fans and editors need a single place to **publish** Champions-style fixtures and
 - Browse all **32 teams** with search and country filter.
 - **Team detail** page with match history and W/D/L stats.
 - Browse **matches** filtered by phase (Groups / Quarter-finals / Semi-finals / Final) and status (Finished / Upcoming).
-- **Match detail** page with full scoreline.
+- **Match detail** page with full scoreline and optional match image.
 - **Standings** table with colour-coded qualification zones (Top 8 → Round of 16, 9–24 → Playoff, 25–32 → Eliminated).
 
 ### Authenticated users
 - **Sign up** and **sign in** via Supabase Auth.
 - Upload and update **profile avatar** (stored in Supabase Storage).
-- Post **comments** on matches.
+- Post, **edit and delete** their own **comments** on matches (ownership).
 
 ### Backoffice
-- **`EDITOR`**: create, edit and delete teams and matches.
-- **`ADMIN`**: full access including user and **role** management (`USER`, `EDITOR`, `ADMIN`).
+- **`EDITOR`**: create, edit and delete teams and matches, including **image uploads** for team crests and match photos.
+- **`ADMIN`**: full access including user and **role** management (`USER`, `EDITOR`, `ADMIN`), and moderation of any comment.
 
 ### Product / engineering
 - **User stories** implemented incrementally following **Scrum** methodology (sessions S19–S20).
 - Data seeded via SQL for local and production demos.
-- **Supabase Storage** bucket for user avatars.
+- **Supabase Storage** buckets for avatars (`avatars`) and content images (`images`).
 - Role-based middleware protecting backoffice routes.
 
 ---
@@ -58,12 +58,12 @@ Fans and editors need a single place to **publish** Champions-style fixtures and
 Browser → Next.js App Router (RSC + Client Components)
                → Prisma (pg adapter) → Supabase PostgreSQL
                → Supabase Auth (sessions via @supabase/ssr)
-               → Supabase Storage (avatar uploads)
+               → Supabase Storage (avatar + content image uploads)
                → API Routes (/api/comments, /api/teams, /api/matches, /api/users/[id]/role)
 ```
 
 - **Public routes** expose teams, matches and standings for visitors.
-- **Authenticated routes** allow commenting on matches.
+- **Authenticated routes** allow commenting on matches (with edit/delete ownership).
 - **Backoffice** (`/backoffice/*`) protected by middleware — EDITOR and ADMIN only.
 
 ---
@@ -71,7 +71,7 @@ Browser → Next.js App Router (RSC + Client Components)
 ## Prerequisites
 
 - **Node.js** LTS
-- A **Supabase** project (PostgreSQL + Auth + Storage bucket `avatars`)
+- A **Supabase** project (PostgreSQL + Auth + Storage buckets `avatars` and `images`)
 - **Git**
 
 ---
@@ -113,6 +113,24 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ---
 
+## Demo accounts
+
+The deployed demo comes with three pre-configured accounts, one per role, so the project can be evaluated end to end:
+
+| Role | Email | Password |
+| --- | --- | --- |
+| **ADMIN** | `admin@test.com` | `admin123` |
+| **EDITOR** | `editor@test.com` | `editor123` |
+| **USER** | `user@test.com` | `user123` |
+
+- **ADMIN** — full access: backoffice dashboard, teams, matches, user/role management and comment moderation.
+- **EDITOR** — backoffice access to create, edit and delete teams and matches (with image uploads).
+- **USER** — can comment on matches and manage their own profile/avatar.
+
+> These are throwaway demo accounts for grading only.
+
+---
+
 ## Roles and admin setup
 
 The app has three roles: `USER` (default), `EDITOR` and `ADMIN`.
@@ -138,8 +156,6 @@ WHERE email = 'your-email@example.com';
 ```
 
 After running it, sign out and sign back in to refresh the session. Once you have one ADMIN, further role changes can be done from the **Users** panel in the backoffice — no SQL needed.
-
-> **Note:** demo admin credentials are provided privately in the assignment submission, not in this public repository.
 
 ---
 
@@ -185,11 +201,11 @@ proyecto-champions-next/
 │   │   ├── matches/        # List + new + edit
 │   │   └── users/          # Role management (ADMIN only)
 │   └── api/
-│       ├── comments/       # POST comment
+│       ├── comments/       # Create / edit / delete comments
 │       ├── teams/          # CRUD teams
 │       ├── matches/        # CRUD matches
 │       └── users/[id]/role # Change user role
-├── components/             # Header, Footer, CommentSection
+├── components/             # Header, Footer, CommentSection, ImageUpload
 ├── lib/
 │   ├── prisma.ts           # Prisma client singleton
 │   └── supabase/           # Server + client Supabase helpers
@@ -204,11 +220,12 @@ proyecto-champions-next/
 
 ## Verification checklist (IA7)
 
-- [x] Visitor can browse **teams** and **matches** with DB-backed data.
-- [x] User can **register** and **log in** via Supabase Auth.
-- [x] Registered user can **upload avatar** and **comment** on a match.
-- [x] `EDITOR` can create, edit and delete teams and matches in the backoffice.
-- [x] `ADMIN` can manage users and roles.
+- [x] **US-01 / US-02** — Visitor can register and log in via Supabase Auth.
+- [x] **US-05 / 06 / 07** — Public zone (teams, matches, standings) backed by the database.
+- [x] **US-08 / 09 / 10** — Comments with ownership: users create, edit and delete their own.
+- [x] **US-11 → US-16** — Full EDITOR CRUD for teams and matches in the backoffice.
+- [x] **US-17 / US-18** — Image uploads for team crests and match photos (Supabase Storage).
+- [x] **US-19 → US-22** — ADMIN user and role administration.
 - [x] App deploys to **Vercel** with production env vars set safely.
 
 ---
