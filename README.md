@@ -1,84 +1,84 @@
 # Champions SaaS
 
-Minimal **multi-user SaaS** for browsing **teams** and **matches**, posting **match comments**, and managing content through **role-based backoffice** panels (`EDITOR`, `ADMIN`). Built as the **M0613 IA7** deliverable (block *Creació d'un SaaS*, sessions S16–S20).
+**SaaS multiusuario** para consultar **equipos** y **partidos**, publicar **comentarios** en los partidos y gestionar el contenido mediante paneles de **backoffice con roles** (`EDITOR`, `ADMIN`). Desarrollado como entrega de la **IA7 del M0613** (bloque *Creació d'un SaaS*, sesiones S16–S20).
 
-**Live demo:** https://proyecto-champions-next.vercel.app  
-**Repository:** https://github.com/ivaaan22/proyecto-champions-next
-
----
-
-## Why this project
-
-Fans and editors need a single place to **publish** Champions-style fixtures and media, while **registered users** can discuss matches. The app separates **public catalog**, **social features**, and **internal tooling** with clear authorization — a common pattern in real B2B/B2C SaaS products.
+**Demo en producción:** https://proyecto-champions-next.vercel.app  
+**Repositorio:** https://github.com/ivaaan22/proyecto-champions-next
 
 ---
 
-## Features
+## Sobre el proyecto
 
-### Public
-- Browse all **32 teams** with search and country filter.
-- **Team detail** page with match history and W/D/L stats.
-- Browse **matches** filtered by phase (Groups / Quarter-finals / Semi-finals / Final) and status (Finished / Upcoming).
-- **Match detail** page with full scoreline and optional match image.
-- **Standings** table with colour-coded qualification zones (Top 8 → Round of 16, 9–24 → Playoff, 25–32 → Eliminated).
+Aficionados y editores necesitan un único lugar donde **publicar** partidos y contenido tipo Champions, mientras que los **usuarios registrados** pueden comentar los encuentros. La aplicación separa el **catálogo público**, las **funciones sociales** y las **herramientas internas** con una autorización clara por roles — un patrón habitual en productos SaaS reales.
 
-### Authenticated users
-- **Sign up** and **sign in** via Supabase Auth.
-- Upload and update **profile avatar** (stored in Supabase Storage).
-- Post, **edit and delete** their own **comments** on matches (ownership).
+---
+
+## Funcionalidades
+
+### Público
+- Consultar los **32 equipos** con buscador y filtro por país.
+- Página de **detalle de equipo** con historial de partidos y estadísticas (victorias/empates/derrotas).
+- Consultar **partidos** filtrados por fase (Grupos / Cuartos / Semifinal / Final) y estado (Finalizado / Próximo).
+- Página de **detalle de partido** con marcador completo e imagen opcional del partido.
+- Tabla de **clasificación** con zonas de colores (Top 8 → octavos, 9–24 → repechaje, 25–32 → eliminados).
+
+### Usuarios autenticados
+- **Registro** e **inicio de sesión** con Supabase Auth.
+- Subir y actualizar la **foto de perfil** (almacenada en Supabase Storage).
+- Publicar, **editar y eliminar** sus propios **comentarios** en los partidos (ownership).
 
 ### Backoffice
-- **`EDITOR`**: create, edit and delete teams and matches, including **image uploads** for team crests and match photos.
-- **`ADMIN`**: full access including user and **role** management (`USER`, `EDITOR`, `ADMIN`), and moderation of any comment.
+- **`EDITOR`**: crear, editar y eliminar equipos y partidos, incluyendo **subida de imágenes** para escudos y fotos de partidos.
+- **`ADMIN`**: acceso total, incluyendo gestión de usuarios y **roles** (`USER`, `EDITOR`, `ADMIN`) y moderación de cualquier comentario.
 
-### Product / engineering
-- **User stories** implemented incrementally following **Scrum** methodology (sessions S19–S20).
-- Data seeded via SQL for local and production demos.
-- **Supabase Storage** buckets for avatars (`avatars`) and content images (`images`).
-- Role-based middleware protecting backoffice routes.
+### Producto / ingeniería
+- **Historias de usuario** implementadas de forma incremental siguiendo metodología **Scrum** (sesiones S19–S20).
+- Datos cargados mediante SQL para las demos locales y de producción.
+- **Buckets de Supabase Storage** para avatares (`avatars`) e imágenes de contenido (`images`).
+- Middleware basado en roles que protege las rutas del backoffice.
 
 ---
 
-## Tech stack
+## Stack tecnológico
 
-| Layer | Technology |
+| Capa | Tecnología |
 | --- | --- |
 | Framework | **Next.js 16** (App Router), **React 19**, **TypeScript** |
-| ORM / DB | **Prisma 7** → **PostgreSQL** (hosted on **Supabase**) |
-| Auth | **Supabase Auth** |
+| ORM / BD | **Prisma 7** → **PostgreSQL** (alojado en **Supabase**) |
+| Autenticación | **Supabase Auth** |
 | UI | **Tailwind CSS v4** |
-| Media | **Supabase Storage** |
-| Deploy | **Vercel** (app) + **Supabase** (DB, auth, storage) |
+| Multimedia | **Supabase Storage** |
+| Despliegue | **Vercel** (app) + **Supabase** (BD, auth, storage) |
 
 ---
 
-## Architecture
+## Arquitectura
 
 ```
-Browser → Next.js App Router (RSC + Client Components)
-               → Prisma (pg adapter) → Supabase PostgreSQL
-               → Supabase Auth (sessions via @supabase/ssr)
-               → Supabase Storage (avatar + content image uploads)
+Navegador → Next.js App Router (RSC + Client Components)
+               → Prisma (adapter pg) → Supabase PostgreSQL
+               → Supabase Auth (sesiones vía @supabase/ssr)
+               → Supabase Storage (subida de avatares e imágenes)
                → API Routes (/api/comments, /api/teams, /api/matches, /api/users/[id]/role)
 ```
 
-- **Public routes** expose teams, matches and standings for visitors.
-- **Authenticated routes** allow commenting on matches (with edit/delete ownership).
-- **Backoffice** (`/backoffice/*`) protected by middleware — EDITOR and ADMIN only.
+- Las **rutas públicas** muestran equipos, partidos y clasificación a los visitantes.
+- Las **rutas autenticadas** permiten comentar los partidos (con edición/borrado propio).
+- El **backoffice** (`/backoffice/*`) está protegido por middleware — solo EDITOR y ADMIN.
 
 ---
 
-## Prerequisites
+## Requisitos previos
 
 - **Node.js** LTS
-- A **Supabase** project (PostgreSQL + Auth + Storage buckets `avatars` and `images`)
+- Un proyecto de **Supabase** (PostgreSQL + Auth + buckets de Storage `avatars` e `images`)
 - **Git**
 
 ---
 
-## Getting started
+## Puesta en marcha
 
-### 1. Clone and install
+### 1. Clonar e instalar
 
 ```bash
 git clone https://github.com/ivaaan22/proyecto-champions-next.git
@@ -86,172 +86,172 @@ cd proyecto-champions-next
 npm install
 ```
 
-### 2. Environment variables
+### 2. Variables de entorno
 
 ```bash
 cp .env.example .env
 ```
 
-Fill in your values (see **Environment** section below). Never commit `.env`.
+Rellena tus valores (ver la sección **Variables de entorno** más abajo). Nunca subas el archivo `.env`.
 
-### 3. Database
+### 3. Base de datos
 
 ```bash
 npx prisma generate
 npx prisma db push
 ```
 
-Then seed the database with teams and matches via **Supabase SQL Editor** (see `prisma/seed/seed.ts` for reference data).
+Después, carga los equipos y partidos mediante el **SQL Editor de Supabase** (ver `prisma/seed/seed.ts` como referencia de los datos).
 
-### 4. Run locally
+### 4. Ejecutar en local
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Abre [http://localhost:3000](http://localhost:3000).
 
 ---
 
-## Demo accounts
+## Cuentas de prueba
 
-The deployed demo comes with three pre-configured accounts, one per role, so the project can be evaluated end to end:
+La demo desplegada incluye tres cuentas preconfiguradas, una por rol, para poder evaluar el proyecto de principio a fin:
 
-| Role | Email | Password |
+| Rol | Email | Contraseña |
 | --- | --- | --- |
 | **ADMIN** | `admin@test.com` | `admin123` |
 | **EDITOR** | `editor@test.com` | `editor123` |
 | **USER** | `user@test.com` | `user123` |
 
-- **ADMIN** — full access: backoffice dashboard, teams, matches, user/role management and comment moderation.
-- **EDITOR** — backoffice access to create, edit and delete teams and matches (with image uploads).
-- **USER** — can comment on matches and manage their own profile/avatar.
+- **ADMIN** — acceso total: panel de backoffice, equipos, partidos, gestión de usuarios/roles y moderación de comentarios.
+- **EDITOR** — acceso al backoffice para crear, editar y eliminar equipos y partidos (con subida de imágenes).
+- **USER** — puede comentar partidos y gestionar su perfil/avatar.
 
-> These are throwaway demo accounts for grading only.
+> Son cuentas de prueba desechables, únicamente para la evaluación.
 
 ---
 
-## Roles and admin setup
+## Roles y configuración de administrador
 
-The app has three roles: `USER` (default), `EDITOR` and `ADMIN`.
+La aplicación tiene tres roles: `USER` (por defecto), `EDITOR` y `ADMIN`.
 
-- **USER** — can comment on matches and upload an avatar.
-- **EDITOR** — can create, edit and delete teams and matches from the backoffice.
-- **ADMIN** — full access, including user and role management.
+- **USER** — puede comentar partidos y subir un avatar.
+- **EDITOR** — puede crear, editar y eliminar equipos y partidos desde el backoffice.
+- **ADMIN** — acceso total, incluyendo gestión de usuarios y roles.
 
-New accounts are created as `USER`. To promote an account to `ADMIN`, run this in the **Supabase SQL Editor** (replace the email with the target account):
+Las cuentas nuevas se crean como `USER`. Para promover una cuenta a `ADMIN`, ejecuta esto en el **SQL Editor de Supabase** (sustituye el email por la cuenta deseada):
 
 ```sql
--- 1. Create / update the profile row as ADMIN
+-- 1. Crear / actualizar el perfil como ADMIN
 INSERT INTO profiles (id, email, username, role, "createdAt", "updatedAt")
 SELECT id, email, raw_user_meta_data->>'username', 'ADMIN', NOW(), NOW()
 FROM auth.users
-WHERE email = 'your-email@example.com'
+WHERE email = 'tu-email@ejemplo.com'
 ON CONFLICT (id) DO UPDATE SET role = 'ADMIN';
 
--- 2. Sync the role into auth metadata (read by the header)
+-- 2. Sincronizar el rol en los metadatos de auth (lo lee el header)
 UPDATE auth.users
 SET raw_user_meta_data = raw_user_meta_data || '{"role": "ADMIN"}'::jsonb
-WHERE email = 'your-email@example.com';
+WHERE email = 'tu-email@ejemplo.com';
 ```
 
-After running it, sign out and sign back in to refresh the session. Once you have one ADMIN, further role changes can be done from the **Users** panel in the backoffice — no SQL needed.
+Tras ejecutarlo, cierra sesión y vuelve a entrar para refrescar la sesión. Una vez tienes un ADMIN, los siguientes cambios de rol se hacen desde el panel de **Usuarios** del backoffice — sin SQL.
 
 ---
 
-## Environment
+## Variables de entorno
 
-| Variable | Description |
+| Variable | Descripción |
 | --- | --- |
-| `DATABASE_URL` | Supabase **pooled** Postgres URL (port 6543, for Prisma client) |
-| `DIRECT_URL` | Supabase **direct** URL (port 5432, for migrations) |
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon/public key |
+| `DATABASE_URL` | URL **pooled** de Postgres en Supabase (puerto 6543, para el cliente Prisma) |
+| `DIRECT_URL` | URL **directa** de Supabase (puerto 5432, para las migraciones) |
+| `NEXT_PUBLIC_SUPABASE_URL` | URL del proyecto de Supabase |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clave anon/pública de Supabase |
 
-Full template in `.env.example` (no secrets).
+Plantilla completa en `.env.example` (sin secretos).
 
 ---
 
 ## Scripts
 
-| Command | Purpose |
+| Comando | Función |
 | --- | --- |
-| `npm run dev` | Start Next.js in development (Turbopack) |
-| `npm run build` | Production build (`prisma generate && next build`) |
-| `npm run start` | Start production server |
+| `npm run dev` | Arranca Next.js en desarrollo (Turbopack) |
+| `npm run build` | Build de producción (`prisma generate && next build`) |
+| `npm run start` | Arranca el servidor de producción |
 | `npm run lint` | ESLint |
-| `npm run db:seed` | Run the Prisma seed script |
+| `npm run db:seed` | Ejecuta el script de seed de Prisma |
 
 ---
 
-## Project structure
+## Estructura del proyecto
 
 ```
 proyecto-champions-next/
 ├── app/
-│   ├── (public)/           # Public routes (home, teams, matches, standings)
-│   │   ├── page.tsx        # Home
-│   │   ├── teams/          # Team list + detail
-│   │   ├── matches/        # Match list + detail + comments
-│   │   └── standings/      # Classification table
-│   ├── (auth)/             # Auth routes (login, register)
-│   ├── backoffice/         # Protected backoffice (EDITOR + ADMIN)
-│   │   ├── page.tsx        # Dashboard with counts
-│   │   ├── teams/          # List + new + edit
-│   │   ├── matches/        # List + new + edit
-│   │   └── users/          # Role management (ADMIN only)
+│   ├── (public)/           # Rutas públicas (inicio, equipos, partidos, clasificación)
+│   │   ├── page.tsx        # Inicio
+│   │   ├── teams/          # Lista de equipos + detalle
+│   │   ├── matches/        # Lista de partidos + detalle + comentarios
+│   │   └── standings/      # Tabla de clasificación
+│   ├── (auth)/             # Rutas de autenticación (login, registro)
+│   ├── backoffice/         # Backoffice protegido (EDITOR + ADMIN)
+│   │   ├── page.tsx        # Panel con contadores
+│   │   ├── teams/          # Lista + nuevo + editar
+│   │   ├── matches/        # Lista + nuevo + editar
+│   │   └── users/          # Gestión de roles (solo ADMIN)
 │   └── api/
-│       ├── comments/       # Create / edit / delete comments
-│       ├── teams/          # CRUD teams
-│       ├── matches/        # CRUD matches
-│       └── users/[id]/role # Change user role
+│       ├── comments/       # Crear / editar / eliminar comentarios
+│       ├── teams/          # CRUD de equipos
+│       ├── matches/        # CRUD de partidos
+│       └── users/[id]/role # Cambiar rol de usuario
 ├── components/             # Header, Footer, CommentSection, ImageUpload
 ├── lib/
-│   ├── prisma.ts           # Prisma client singleton
-│   └── supabase/           # Server + client Supabase helpers
+│   ├── prisma.ts           # Singleton del cliente Prisma
+│   └── supabase/           # Helpers de Supabase (servidor + cliente)
 ├── prisma/
-│   ├── schema.prisma       # Data model (Profile, Team, Match, Comment)
-│   └── seed/seed.ts        # Seed script
-├── types/                  # Shared TypeScript types
-└── middleware.ts            # Route protection by role
+│   ├── schema.prisma       # Modelo de datos (Profile, Team, Match, Comment)
+│   └── seed/seed.ts        # Script de seed
+├── types/                  # Tipos TypeScript compartidos
+└── middleware.ts            # Protección de rutas por rol
 ```
 
 ---
 
-## Verification checklist (IA7)
+## Checklist de verificación (IA7)
 
-- [x] **US-01 / US-02** — Visitor can register and log in via Supabase Auth.
-- [x] **US-05 / 06 / 07** — Public zone (teams, matches, standings) backed by the database.
-- [x] **US-08 / 09 / 10** — Comments with ownership: users create, edit and delete their own.
-- [x] **US-11 → US-16** — Full EDITOR CRUD for teams and matches in the backoffice.
-- [x] **US-17 / US-18** — Image uploads for team crests and match photos (Supabase Storage).
-- [x] **US-19 → US-22** — ADMIN user and role administration.
-- [x] App deploys to **Vercel** with production env vars set safely.
-
----
-
-## Deployment
-
-1. Push to GitHub and connect the repo to **Vercel**.
-2. Set all environment variables in the Vercel dashboard (same keys as `.env`).
-3. Vercel runs `prisma generate && next build` and deploys automatically on every push to `master`.
+- [x] **US-01 / US-02** — El visitante puede registrarse e iniciar sesión con Supabase Auth.
+- [x] **US-05 / 06 / 07** — Zona pública (equipos, partidos, clasificación) con datos de la base de datos.
+- [x] **US-08 / 09 / 10** — Comentarios con ownership: los usuarios crean, editan y eliminan los suyos.
+- [x] **US-11 → US-16** — CRUD completo de EDITOR para equipos y partidos en el backoffice.
+- [x] **US-17 / US-18** — Subida de imágenes para escudos de equipos y fotos de partidos (Supabase Storage).
+- [x] **US-19 → US-22** — Administración de usuarios y roles por parte del ADMIN.
+- [x] La aplicación se despliega en **Vercel** con las variables de entorno de producción configuradas de forma segura.
 
 ---
 
-## Academic context
+## Despliegue
 
-Developed as **IA7 — Kates Serveis web** within **M0613** (DAW2).  
-Product discovery and backlog: **Scrum** (session S19).  
-Implementation: guided sprints (session S20).
-
----
-
-## License
-
-Educational use — all rights reserved for classroom purposes.
+1. Sube el código a GitHub y conecta el repositorio a **Vercel**.
+2. Configura todas las variables de entorno en el panel de Vercel (las mismas claves que en `.env`).
+3. Vercel ejecuta `prisma generate && next build` y despliega automáticamente en cada push a `master`.
 
 ---
 
-## Author
+## Contexto académico
+
+Desarrollado como **IA7 — Kates Serveis web** dentro del **M0613** (DAW2).  
+Discovery de producto y backlog: **Scrum** (sesión S19).  
+Implementación: sprints guiados (sesión S20).
+
+---
+
+## Licencia
+
+Uso educativo — todos los derechos reservados para fines de clase.
+
+---
+
+## Autor
 
 **Ivan Garcia** — [GitHub](https://github.com/ivaaan22)
