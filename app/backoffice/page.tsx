@@ -10,10 +10,10 @@ export default async function BackofficeHomePage() {
   ])
 
   const stats = [
-    { label: "Equipos",     value: teamsCount,    icon: "🏟️", href: "/backoffice/teams"   },
-    { label: "Partidos",    value: matchesCount,  icon: "⚽", href: "/backoffice/matches" },
-    { label: "Usuarios",    value: usersCount,    icon: "👥", href: "/backoffice/users"   },
-    { label: "Comentarios", value: commentsCount, icon: "💬", href: "#"                   },
+    { label: "Equipos",     value: teamsCount,    icon: "🏟️", href: "/backoffice/teams"    },
+    { label: "Partidos",    value: matchesCount,  icon: "⚽", href: "/backoffice/matches"  },
+    { label: "Usuarios",    value: usersCount,    icon: "👥", href: "/backoffice/users"    },
+    { label: "Comentarios", value: commentsCount, icon: "💬", href: "/backoffice/comments" },
   ]
 
   return (

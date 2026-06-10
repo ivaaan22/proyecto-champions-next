@@ -23,11 +23,17 @@ export default async function BackofficeLayout({ children }: { children: React.R
           <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Backoffice</p>
           <p className="text-sm font-bold text-amber-400">{profile.role}</p>
         </div>
+        <Link href="/backoffice" className="text-sm text-slate-300 hover:text-white px-3 py-2 rounded-lg hover:bg-white/5 transition-colors">
+          📊 Panel
+        </Link>
         <Link href="/backoffice/teams" className="text-sm text-slate-300 hover:text-white px-3 py-2 rounded-lg hover:bg-white/5 transition-colors">
           🏟️ Equipos
         </Link>
         <Link href="/backoffice/matches" className="text-sm text-slate-300 hover:text-white px-3 py-2 rounded-lg hover:bg-white/5 transition-colors">
           ⚽ Partidos
+        </Link>
+        <Link href="/backoffice/comments" className="text-sm text-slate-300 hover:text-white px-3 py-2 rounded-lg hover:bg-white/5 transition-colors">
+          💬 Comentarios
         </Link>
         {profile.role === "ADMIN" && (
           <Link href="/backoffice/users" className="text-sm text-slate-300 hover:text-white px-3 py-2 rounded-lg hover:bg-white/5 transition-colors">
